@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>智能体中枢 · Enterprise Agent Hub</title>
+  <style>
+    :root {
+      --primary: #1890ff;
+      --primary-dark: #096dd9;
+      --bg-light: #f0f2f5;
+      --bg-card: #ffffff;
+      --text: #262626;
+      --text-secondary: #8c8c8c;
+      --border: #e8e8e8;
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s ease-in-out;
+    }
+
+    [data-theme="dark"] {
+      --primary: #1890ff;
+      --bg-light: #141414;
+      --bg-card: #1f1f1f;
+      --text: #e6e6e6;
+      --text-secondary: #a6a6a6;
+      --border: #303030;
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg-light);
+      color: var(--text);
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    /* 顶部导航 */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 24px;
+      height: 64px;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-size: 20px;
+      font-weight: bold;
+      color: var(--primary);
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .theme-toggle {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    .banner {
+      /* 移除 background-image */
+      background: linear-gradient(120deg, #0f2027, #203a43, #2c5364);
+      position: relative;
+      overflow: hidden;
+      color: white;
+      text-align: center;
+      padding: 120px 0;
+    }
+
+    .banner {
+      position: relative;
+      overflow: hidden;
+      color: white;
+      text-align: center;
+      padding: 120px 0;
+      background: linear-gradient(to bottom, #0077be, #00a8cc, #3ac5f4);
+      /* 清澈蓝到天蓝渐变 */
+    }
+
+    /* 海洋波浪层 */
+    .banner::before,
+    .banner::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 200%;
+      height: 120px;
+      /* 波浪高度 */
+      background-repeat: repeat-x;
+      pointer-events: none;
+    }
+
+    /* 第一层波浪（前景） */
+    .banner::before {
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M0,60 Q300,0 600,60 T1200,60 L1200,120 L0,120 Z" fill="rgba(255,255,255,0.3)"/></svg>');
+      animation: wave 12s infinite linear;
+      opacity: 0.8;
+    }
+
+    /* 第二层波浪（背景，更慢更淡） */
+    .banner::after {
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M0,80 Q300,120 600,80 T1200,80 L1200,120 L0,120 Z" fill="rgba(255,255,255,0.2)"/></svg>');
+      animation: wave 18s infinite linear reverse;
+      opacity: 0.5;
+      height: 140px;
+      bottom: -10px;
+    }
+
+    @keyframes wave {
+      0% {
+        transform: translateX(0);
+      }
+
+      100% {
+        transform: translateX(-1200px);
+      }
+    }
+
+    /* 可选：让文字更有层次感 */
+    .banner h1 {
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .banner p {
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    /* 添加动态粒子效果（伪元素模拟） */
+    /* .banner::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background:
+        radial-gradient(circle at 20% 30%, rgba(24, 144, 255, 0.1) 0%, transparent 40%),
+        radial-gradient(circle at 80% 70%, rgba(0, 212, 255, 0.1) 0%, transparent 40%),
+        repeating-linear-gradient(0deg, transparent, transparent 19px, rgba(255, 255, 255, 0.03) 20px, transparent 21px);
+      pointer-events: none;
+      animation: float 15s infinite linear;
+    }
+
+    @keyframes float {
+      0% {
+        background-position: 0 0, 0 0, 0 0;
+      }
+
+      100% {
+        background-position: 100px 100px, -100px -100px, 0 20px;
+      }
+    } */
+
+    /* 横幅区 */
+    /* .banner {
+      background: url('E:\Users\dell\Desktop\图\1735303571920.png') no-repeat center center / cover;
+      color: white;
+      text-align: center;
+      padding: 120px 0;
+    }
+
+    .banner h1 {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .banner p {
+      font-size: 18px;
+      max-width: 700px;
+      margin: 0 auto;
+      opacity: 0.9;
+    } */
+
+    .cta-button {
+      display: inline-block;
+      margin-top: 24px;
+      padding: 12px 24px;
+      background: var(--primary);
+      color: white;
+      border-radius: 24px;
+      font-size: 16px;
+      transition: var(--transition);
+    }
+
+    .cta-button:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+
+    .categories {
+      display: flex;
+      gap: 12px;
+      margin: 24px 0 32px;
+      flex-wrap: wrap;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .category {
+      padding: 8px 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: var(--transition);
+      user-select: none;
+    }
+
+    .category:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .category.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+      box-shadow: 0 4px 12px rgba(24, 144, 255, 0.25);
+    }
+
+    /* 主内容区 */
+    .container {
+      max-width: 1400px;
+      margin: 48px auto;
+      padding: 0 24px;
+    }
+
+    .section-title {
+      font-size: 32px;
+      margin-bottom: 24px;
+      position: relative;
+      padding-left: 30px;
+    }
+
+    .section-title::before {
+      content: "★";
+      color: var(--primary);
+      font-size: 24px;
+      position: absolute;
+      left: 0;
+      top: -5px;
+    }
+
+    .agents-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+    }
+
+    .agent-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+    }
+
+    .agent-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    }
+
+    .agent-icon {
+      width: 56px;
+      height: 56px;
+      background: rgba(24, 144, 255, 0.1);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: var(--primary);
+      margin-bottom: 16px;
+    }
+
+    .agent-name {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .agent-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .agent-meta {
+      margin-top: 12px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .status {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #52c41a;
+      margin-right: 6px;
+    }
+
+    .agent-card.hidden {
+      display: none !important;
+    }
+
+    /* 特色功能区 */
+    .features {
+      padding: 60px 0;
+      background: linear-gradient(135deg, #003f8c, #0066cc);
+      color: white;
+      text-align: center;
+    }
+
+    .feature-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 40px;
+    }
+
+    .feature-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .feature-title {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    .feature-desc {
+      max-width: 300px;
+      margin: 0 auto;
+      opacity: 0.9;
+    }
+
+    /* 合作伙伴区 */
+    .partners {
+      padding: 60px 0;
+      background: #f9f9f9;
+      text-align: center;
+    }
+
+    .partner-logo {
+      width: 120px;
+      height: 60px;
+      object-fit: contain;
+      margin: 0 20px;
+    }
+
+    /* 底部 */
+    .footer {
+      text-align: center;
+      padding: 32px;
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 0 16px;
+        height: 56px;
+      }
+
+      .container {
+        padding: 0 16px;
+      }
+
+      .agents-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- 顶部导航 -->
+  <nav class="navbar">
+    <div class="logo">AgentHub Enterprise</div>
+    <div class="nav-right">
+      <span>Admin | 企业智能中枢 v2.1</span>
+      <button class="theme-toggle" id="themeToggle">🌙</button>
+    </div>
+  </nav>
+
+  <!-- 横幅区 -->
+  <div class="banner">
+    <h1>AI智能体中枢平台</h1>
+    <p>统一调度、监控与管理企业级 AI 智能体，赋能业务自动化与决策智能化</p>
+    <a href="#" class="cta-button">立即探索</a>
+  </div>
+
+  <!-- 主内容 -->
+  <div class="container">
+    <!-- 智能体分类标签 -->
+    <div class="categories">
+      <div class="category active">全部</div>
+      <div class="category">客户服务</div>
+      <div class="category">生产运维</div>
+      <div class="category">数据分析</div>
+      <div class="category">安全合规</div>
+      <div class="category">人力资源</div>
+      <div class="category">供应链</div>
+    </div>
+
+    <!-- 智能体卡片 -->
+    <div class="agents-grid">
+      <!-- 客户服务 -->
+      <div class="agent-card" data-categories="董事长分身" onclick="launchAgent('https://1015069scsc34.vicp.fun/chat/c05dbca46dcafa22')">
+        <div class="agent-icon">💬</div>
+        <div class="agent-name">董事长分身</div>
+        <div class="agent-desc">您好，我是马云分身小助手。</div>
+        <div class="agent-meta">
+          <span><span class="status"></span>运行中</span>
+          <span>响应延迟: 120ms</span>
+        </div>
+      </div>
+
+      <!-- 生产运维 -->
+      <div class="agent-card" data-categories="生产运维" onclick="launchAgent('https://www.google.com')">
+        <div class="agent-icon">⚙️</div>
+        <div class="agent-name">设备智能巡检员</div>
+        <div class="agent-desc">基于IoT数据自动诊断设备异常，预测故障并推送维修建议。</div>
+        <div class="agent-meta">
+          <span><span class="status"></span>运行中</span>
+          <span>准确率: 98.2%</span>
+        </div>
+      </div>
+
+      <!-- 安全合规 -->
+      <div class="agent-card" data-categories="安全合规" onclick="launchAgent('https://www.github.com')">
+        <div class="agent-icon">🛡️</div>
+        <div class="agent-name">合规审计官</div>
+        <div class="agent-desc">自动扫描合同、邮件、操作日志，识别合规风险并生成报告。</div>
+        <div class="agent-meta">
+          <span><span class="status"></span>运行中</span>
+          <span>更新: 2小时前</span>
+        </div>
+      </div>
+      
+      <!-- 数据分析 -->
+      <div class="agent-card" data-categories="数据分析" onclick="launchAgent('销售预测引擎')">
+        <div class="agent-icon">📈</div>
+        <div class="agent-name">销售预测引擎</div>
+        <div class="agent-desc">融合历史数据与市场趋势，提供周/月/季度销量预测。</div>
+        <div class="agent-meta">
+          <span><span class="status"></span>运行中</span>
+          <span>误差率: 3.1%</span>
+        </div>
+      </div>
+
+      <!-- 人力资源 -->
+      <div class="agent-card" data-categories="人力资源" onclick="launchAgent('招聘筛选官')">
+        <div class="agent-icon">👥</div>
+        <div class="agent-name">AI招聘筛选官</div>
+        <div class="agent-desc">自动解析简历，匹配岗位需求，推荐高潜力候选人。</div>
+        <div class="agent-meta">
+          <span><span class="status"></span>运行中</span>
+          <span>匹配准确率: 92%</span>
+        </div>
+      </div>
+
+      <!-- 供应链 -->
+      <div class="agent-card" data-categories="供应链" onclick="launchAgent('库存优化师')">
+        <div class="agent-icon">📦</div>
+        <div class="agent-name">智能库存优化师</div>
+        <div class="agent-desc">动态预测库存需求，自动触发补货建议，降低滞销风险。</div>
+        <div class="agent-meta">
+          <span><span class="status"></span>运行中</span>
+          <span>节省成本: ¥120万/年</span>
+        </div>
+      </div>
+
+      <!-- 多分类示例：既属于“数据分析”也属于“生产运维” -->
+      <div class="agent-card" data-categories="数据分析 生产运维" onclick="launchAgent('能耗分析师')">
+        <div class="agent-icon">⚡</div>
+        <div class="agent-name">工厂能耗分析师</div>
+        <div class="agent-desc">实时监控产线能耗，识别浪费点并提供节能方案。</div>
+        <div class="agent-meta">
+          <span><span class="status"></span>运行中</span>
+          <span>节电率: 18%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 特色功能区 -->
+  <div class="features">
+    <h2 class="section-title">特色功能</h2>
+    <div class="feature-item">
+      <div class="feature-icon">📊</div>
+      <div class="feature-title">实时数据分析</div>
+      <div class="feature-desc">集成企业内部各类数据源，实现一站式数据分析与可视化。</div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">🚀</div>
+      <div class="feature-title">快速部署上线</div>
+      <div class="feature-desc">支持容器化部署，一键发布至Kubernetes集群，简化运维流程。</div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">🔒</div>
+      <div class="feature-title">高级安全防护</div>
+      <div class="feature-desc">采用RBAC权限控制，结合SSL加密传输，确保数据安全无忧。</div>
+    </div>
+  </div>
+
+  <!-- 合作伙伴区 -->
+  <div class="partners">
+    <h2 class="section-title">合作伙伴</h2>
+    <img src="https://via.placeholder.com/120x60?text=Partner+1" alt="合作伙伴1" class="partner-logo">
+    <img src="https://via.placeholder.com/120x60?text=Partner+2" alt="合作伙伴2" class="partner-logo">
+    <img src="https://via.placeholder.com/120x60?text=Partner+3" alt="合作伙伴3" class="partner-logo">
+    <img src="https://via.placeholder.com/120x60?text=Partner+4" alt="合作伙伴4" class="partner-logo">
+  </div>
+
+  <!-- 底部 -->
+  <div class="footer">
+    © 2025 AgentHub Enterprise Platform | 支持 Kubernetes 部署 · OpenAPI 3.0 · RBAC 权限控制
+  </div>
+
+  <script>
+    // 主题切换（保持不变）
+    const themeToggle = document.getElementById('themeToggle');
+    const body = document.body;
+    const isDark = localStorage.getItem('theme') === 'dark';
+
+    if (isDark) {
+      body.setAttribute('data-theme', 'dark');
+      themeToggle.textContent = '☀️';
+    }
+
+    themeToggle.addEventListener('click', () => {
+      const isNowDark = body.getAttribute('data-theme') === 'dark';
+      if (isNowDark) {
+        body.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'light');
+        themeToggle.textContent = '🌙';
+      } else {
+        body.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+        themeToggle.textContent = '☀️';
+      }
+    });
+
+    // 启动智能体 —— 跳转到指定 URL，在新标签页打开
+    function launchAgent(url) {
+      if (url && url.startsWith('http')) {
+        window.open(url, '_blank', 'noopener,noreferrer');
+      } else {
+        console.warn('无效或缺失的 URL:', url);
+      }
+    }
+
+    // 分类切换逻辑（全新实现）
+    document.querySelectorAll('.category').forEach(button => {
+      button.addEventListener('click', () => {
+        // 更新激活状态
+        document.querySelectorAll('.category').forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+
+        const selectedCategory = button.textContent.trim();
+
+        // 获取所有卡片
+        const cards = document.querySelectorAll('.agent-card');
+
+        cards.forEach(card => {
+          const categories = card.getAttribute('data-categories').split(' ');
+          if (selectedCategory === '全部' || categories.includes(selectedCategory)) {
+            card.classList.remove('hidden');
+          } else {
+            card.classList.add('hidden');
+          }
+        });
+      });
+    });
+  </script>
+</body>
+
+</html>
